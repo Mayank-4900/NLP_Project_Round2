@@ -449,6 +449,32 @@ def confusion_matrix_book2(y_pred):
   print(metrics.classification_report(y_act, y_pred, labels=['second','walter','elizabeth','mary','charles musgrove','anne','wayshe','one','sixteen','two']))
   print(accuracy_score(y_act, y_pred))
 
+#Used for findiing Person-Organisation and Person-GPE relationships
+def relationBetweenEntities(sentences):
+    
+    tokenized_sentences = [word_tokenize(sentence) for sentence in sentences]
+    tagged_sentences = [nltk.tag.pos_tag(sentence) for sentence in tokenized_sentences]
+    
+    OF = re.compile(r'.*\bof\b.*')
+    IN = re.compile(r'.*\bin\b(?!\b.+ing)')
+    
+    print('PERSON-ORGANISATION Relationships:')
+
+    for i, sent in enumerate(tagged_sentences):
+        sent = nltk.chunk.ne_chunk(sent) # ne_chunk method expects onetagged sentence
+        rels = extract_rels('PER', 'ORG', sent, corpus='ace', pattern=IN, window=10)
+        for rel in rels:
+            print(rtuple(rel))
+    
+    print()    
+    print('PERSON-GPE Relationships:')
+
+    for i, sent in enumerate(tagged_sentences):
+        sent = nltk.chunk.ne_chunk(sent) # ne_chunk method expects one tagged sentence
+        rels = extract_rels('PER', 'GPE', sent, corpus='ace', pattern=OF, window=10)
+        for rel in rels:
+            print(rtuple(rel))
+
 
 
 
@@ -506,3 +532,6 @@ for i in x:
     y.append(j)
 y
 confusion_matrix_book2(y)
+
+relationBetweenEntities(sentences_book1)
+relationBetweenEntities(sentences_book2)
